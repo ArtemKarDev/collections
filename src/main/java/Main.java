@@ -1,29 +1,30 @@
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
-    public static void main(String[] args){
-        List<String> stringArrayList = new ArrayList<>();
-        stringArrayList.add("q");
-        stringArrayList.add("w");
-        stringArrayList.add("e");
-        stringArrayList.add("n");
-        System.out.println(getStringFromStream(stringArrayList.stream()));
-
-        printList((ArrayList) stringArrayList);
+    public static void main(String[] args) throws IllegalAccessException {
+        Cat cat = new Cat("Vasya", 10, 5.5,new ArrayList<>(Arrays.asList("Anton", "Oleg", "Igor")));
+        setNullToFieldsClass(cat);
     }
 
-    public static String getStringFromStream(Stream stringStream) {
-        //напишите тут ваш код
-        return (String) stringStream.collect(Collectors.joining(" "));
+    public static void setNullToFieldsClass(Object obj){
+        Class<?> someClass = obj.getClass();
 
-    }
+        System.out.println("Объект до обнуления: "+obj);
 
-    public static void printList(ArrayList list){
-        list.forEach(System.out::println);
+        for(Field field: someClass.getDeclaredFields()){
+            try {
+
+                field.setAccessible(true);
+                if (!field.getType().isPrimitive()) {
+                    System.out.println("Обнуляем поле "+ field.getName()+" с типом "+field.getType());
+                    field.set(obj, null);
+                } else {System.out.println("Не обнуляем поле "+ field.getName()+" с типом "+field.getType());}
+            } catch (IllegalAccessException ignored){
+            }
+        }
+        System.out.println("Объект после обнуления: "+obj);
     }
 
 }
